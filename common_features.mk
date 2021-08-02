@@ -237,11 +237,12 @@ endif
     SRC += $(QUANTUM_DIR)/process_keycode/process_backlight.c
     SRC += $(QUANTUM_DIR)/led_matrix/led_matrix.c
     SRC += $(QUANTUM_DIR)/led_matrix/led_matrix_drivers.c
+    SRC += $(LIB_PATH)/lib8tion/lib8tion.c
     CIE1931_CURVE := yes
 
     ifeq ($(strip $(LED_MATRIX_DRIVER)), IS31FL3731)
         OPT_DEFS += -DIS31FL3731 -DSTM32_I2C -DHAL_USE_I2C=TRUE
-        COMMON_VPATH += $(DRIVER_PATH)/issi
+        COMMON_VPATH += $(DRIVER_PATH)/led/issi
         SRC += is31fl3731-simple.c
         QUANTUM_LIB_SRC += i2c_master.c
     endif
@@ -265,40 +266,41 @@ endif
     SRC += $(QUANTUM_DIR)/color.c
     SRC += $(QUANTUM_DIR)/rgb_matrix/rgb_matrix.c
     SRC += $(QUANTUM_DIR)/rgb_matrix/rgb_matrix_drivers.c
+    SRC += $(LIB_PATH)/lib8tion/lib8tion.c
     CIE1931_CURVE := yes
     RGB_KEYCODES_ENABLE := yes
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), AW20216)
         OPT_DEFS += -DAW20216 -DSTM32_SPI -DHAL_USE_SPI=TRUE
-        COMMON_VPATH += $(DRIVER_PATH)/awinic
+        COMMON_VPATH += $(DRIVER_PATH)/led
         SRC += aw20216.c
         QUANTUM_LIB_SRC += spi_master.c
     endif
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), IS31FL3731)
         OPT_DEFS += -DIS31FL3731 -DSTM32_I2C -DHAL_USE_I2C=TRUE
-        COMMON_VPATH += $(DRIVER_PATH)/issi
+        COMMON_VPATH += $(DRIVER_PATH)/led/issi
         SRC += is31fl3731.c
         QUANTUM_LIB_SRC += i2c_master.c
     endif
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), IS31FL3733)
         OPT_DEFS += -DIS31FL3733 -DSTM32_I2C -DHAL_USE_I2C=TRUE
-        COMMON_VPATH += $(DRIVER_PATH)/issi
+        COMMON_VPATH += $(DRIVER_PATH)/led/issi
         SRC += is31fl3733.c
         QUANTUM_LIB_SRC += i2c_master.c
     endif
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), IS31FL3737)
         OPT_DEFS += -DIS31FL3737 -DSTM32_I2C -DHAL_USE_I2C=TRUE
-        COMMON_VPATH += $(DRIVER_PATH)/issi
+        COMMON_VPATH += $(DRIVER_PATH)/led/issi
         SRC += is31fl3737.c
         QUANTUM_LIB_SRC += i2c_master.c
     endif
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), IS31FL3741)
         OPT_DEFS += -DIS31FL3741 -DSTM32_I2C -DHAL_USE_I2C=TRUE
-        COMMON_VPATH += $(DRIVER_PATH)/issi
+        COMMON_VPATH += $(DRIVER_PATH)/led/issi
         SRC += is31fl3741.c
         QUANTUM_LIB_SRC += i2c_master.c
     endif
@@ -332,11 +334,6 @@ ifeq ($(strip $(PRINTING_ENABLE)), yes)
     SRC += $(TMK_DIR)/protocol/serial_uart.c
 endif
 
-ifeq ($(strip $(KEY_OVERRIDE_ENABLE)), yes)
-    OPT_DEFS += -DKEY_OVERRIDE_ENABLE
-    SRC += $(QUANTUM_DIR)/process_keycode/process_key_override.c
-endif
-
 ifeq ($(strip $(SERIAL_LINK_ENABLE)), yes)
     SERIAL_SRC := $(wildcard $(SERIAL_PATH)/protocol/*.c)
     SERIAL_SRC += $(wildcard $(SERIAL_PATH)/system/*.c)
@@ -359,11 +356,6 @@ endif
 
 ifeq ($(strip $(LCD_ENABLE)), yes)
     CIE1931_CURVE := yes
-endif
-
-# backward compat
-ifeq ($(strip $(BACKLIGHT_CUSTOM_DRIVER)), yes)
-    BACKLIGHT_DRIVER := custom
 endif
 
 VALID_BACKLIGHT_TYPES := pwm timer software custom
@@ -425,7 +417,7 @@ ifeq ($(strip $(WS2812_DRIVER_REQUIRED)), yes)
 endif
 
 ifeq ($(strip $(APA102_DRIVER_REQUIRED)), yes)
-    COMMON_VPATH += $(DRIVER_PATH)/apa102
+    COMMON_VPATH += $(DRIVER_PATH)/led
     SRC += apa102.c
 endif
 
@@ -578,8 +570,9 @@ endif
 HAPTIC_ENABLE ?= no
 ifneq ($(strip $(HAPTIC_ENABLE)),no)
     COMMON_VPATH += $(DRIVER_PATH)/haptic
-    SRC += haptic.c
     OPT_DEFS += -DHAPTIC_ENABLE
+    SRC += $(QUANTUM_DIR)/haptic.c
+    SRC += $(QUANTUM_DIR)/process_keycode/process_haptic.c
 endif
 
 ifneq ($(filter DRV2605L, $(HAPTIC_ENABLE)), )
@@ -663,6 +656,11 @@ endif
 ifeq ($(strip $(COMBO_ENABLE)), yes)
     SRC += $(QUANTUM_DIR)/process_keycode/process_combo.c
     OPT_DEFS += -DCOMBO_ENABLE
+endif
+
+ifeq ($(strip $(KEY_OVERRIDE_ENABLE)), yes)
+    SRC += $(QUANTUM_DIR)/process_keycode/process_key_override.c
+    OPT_DEFS += -DKEY_OVERRIDE_ENABLE
 endif
 
 ifeq ($(strip $(TAP_DANCE_ENABLE)), yes)

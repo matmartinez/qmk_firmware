@@ -22,15 +22,13 @@
         },
         "bootloader": {
             "type": "string",
-            "enum": ["atmel-dfu", "bootloadHID", "caterina", "halfkay", "kiibohd", "lufa-dfu", "lufa-ms", "micronucleus", "qmk-dfu", "stm32-dfu", "stm32duino", "unknown", "USBasp", "tinyuf2"]
+            "enum": ["atmel-dfu", "bootloadHID", "caterina", "halfkay", "kiibohd", "lufa-dfu", "lufa-ms", "micronucleus", "qmk-dfu", "qmk-hid", "stm32-dfu", "stm32duino", "unknown", "USBasp", "tinyuf2"]
         },
         "diode_direction": {
             "type": "string",
             "enum": ["COL2ROW", "ROW2COL"]
         },
         "debounce": {"$ref": "qmk.definitions.v1#/unsigned_int"},
-        "height": {"$ref": "qmk.definitions.v1#/key_unit"},
-        "width": {"$ref": "qmk.definitions.v1#/key_unit"},
         "community_layouts": {
             "type": "array",
             "items": {"$ref": "qmk.definitions.v1#/filename"}
